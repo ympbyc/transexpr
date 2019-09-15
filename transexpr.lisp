@@ -7,6 +7,7 @@
 ;;     Gives you macros      ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar *transexpr-log* nil)
 
 (defparameter *infix-ops* (mapcar #'symbol-name '(+ - * / % = == !=)))
 
@@ -53,11 +54,11 @@
 (defmethod transpile ((expr list))
   (multiple-value-bind (form _)
       (let ((operator (transpile (car expr))))
-	(format t "LOG: ~A ~%" operator)
+	(if *transexpr-log* (format t "LOG: ~A ~%" operator))
 	(cond ((not (symbolp operator))
 	       (warn "Not implemented"))
 	      ((macro-function operator)
-	       (macroexpand-1 (cons operator (cdr expr))))
+	       (macroexpand (cons operator (cdr expr))))
 	      (t (transpile-funcall operator expr))))
     (declare (ignore _))
     form))
